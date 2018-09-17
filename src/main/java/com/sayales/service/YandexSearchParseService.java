@@ -15,26 +15,35 @@ public class YandexSearchParseService implements ParseService {
 
     private ConstantProviderService constantService = new HardcodeConstantProviderService();
 
+
+    //В возвращаемой строке: constantService.getFileDelimiter() - граница файла и constantService.getPropertyDelimiter() - граница свойства (url, Заголовок, краткое описание)
     @Override
-    public String parseData(String parseUrl) throws IOException { //Return string has two delimiters: <newfile/> for another file and <prop/> to filename and cont
+    public String parseData(String parseUrl) throws IOException {
         Document doc = Jsoup.connect(parseUrl)
                 .ignoreContentType(true)
                 .userAgent("Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:25.0) Gecko/20100101 Firefox/25.0")
                 .timeout(12000)
                 .followRedirects(true).execute().parse();
         StringBuilder result = new StringBuilder();
+
         Elements searchTitles = doc.select(".serp-item");
         searchTitles.forEach(element -> {
-            String title = element.selectFirst(".organic__url-text").text();
-            Element urlElement = element.selectFirst(".organic__subtitle.organic__subtitle_overflow_yes.typo.typo_type_greenurl").selectFirst(".path.organic__path");
-            Elements links = urlElement.select("a");
-            String url = links.get(links.size() - 1).attr("href");
-            String review = element.selectFirst(".extended-text__full").text();
+            Element titleElement = element.selectFirst(".organic__url-text");
+            if (titleElement == null)
+                return;
+            String title = titleElement.text();
+            Element urlLinksElement = element.selectFirst(".path.organic__path");
+            Elements links = urlLinksElement.select("a");
+            Element link = links.get(links.size()-1);
+            String url = link != null ? link.attr("href") : "";
+            Element reviewElement = element.selectFirst(".extended-text__full");
+            if (reviewElement == null)
+                reviewElement = element.selectFirst(".text-container.typo.typo_text_m.typo_line_m.organic__text");
+            String review = reviewElement != null ? reviewElement.text() : "";
             String newStringEntry = url + constantService.getPropertyDelimiter() + title + constantService.getPropertyDelimiter() + review + constantService.getFileDelimiter();
             result.append(newStringEntry);
         });
-        String resultString = result.toString();
 
-        return resultString;
+        return result.toString();
     }
 }
