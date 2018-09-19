@@ -1,6 +1,7 @@
 package com.sayales.inputs;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -16,6 +17,9 @@ public class ConsoleFolderProvider implements FolderProvider {
         System.out.println("Input folder to save files");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Path folder = Paths.get(reader.readLine());
+        if (!Files.exists(folder)) {
+            Files.createDirectories(folder);
+        }
         while (!Files.isDirectory(folder)) {
             System.out.println("Input valid directory");
             folder = Paths.get(reader.readLine());
