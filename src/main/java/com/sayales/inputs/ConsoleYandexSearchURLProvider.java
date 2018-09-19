@@ -7,17 +7,18 @@ import java.io.InputStreamReader;
 /**
  * Created by Pavel on 17.09.2018.
  */
-public class ConsoleYandexSearchURLProvider implements SearchURLProvider {
+public class ConsoleYandexSearchURLProvider implements URLProvider {
+
+    private static final String YA_URL = "http://yandex.ru/search/?text=";
 
     @Override
-    public String getSearchText() throws IOException {
-        System.out.println("Input yandex search url");
+    public String getURL() throws IOException {
+        System.out.println("Input yandex search url (http://yandex.ru/search/...) or search request");
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        String searchText = reader.readLine().trim();
-      /*  while (!searchText.startsWith("http://www.yandex.ru/search/")) {
-            System.out.println("Url should looks like \"http://www.yandex.ru/search/...\"");
-            searchText = reader.readLine().trim();
-         }*/
-        return searchText;
+        String input = reader.readLine().trim();
+        if (input.contains("yandex.ru/search/?"))
+            return input;
+        else
+            return YA_URL + input;
     }
 }

@@ -9,7 +9,6 @@ public interface ConstantProviderService {
 
     String getPropertyDelimiter();
 
-
     String getFileDelimiter();
 
 }
